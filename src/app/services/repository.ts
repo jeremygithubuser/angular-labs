@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { catchError, map, tap, share } from 'rxjs/operators';
+import { catchError, map, tap, share, delay } from 'rxjs/operators';
 import { Post } from '../models/post';
 
 const httpOptions = {
@@ -40,6 +40,8 @@ export class Repository {
                 catchError(this.handleError('getPosts'))
             ) as Observable<Post[]>;
     }
+
+
     /**
      * Returns a function that handles Http operation failures.
      * This error handler lets the app continue to run as if no error occurred.

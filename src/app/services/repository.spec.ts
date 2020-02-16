@@ -1,11 +1,9 @@
 // Straight Jasmine testing without Angular's testing support
 import { TestBed, inject } from '@angular/core/testing';
-import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Repository } from './repository';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Post } from '../models/post';
-import { post } from 'selenium-webdriver/http';
 describe('Repository', () => {
 
   const posts = [
@@ -79,7 +77,7 @@ describe('Repository', () => {
         });
 
         observable.subscribe((p: Post[]) => {
-          console.log("with the pipe share the observable uses the same stream")
+          console.log('with the pipe share the observable uses the same stream');
         });
 
         const mockReq = httpMock.expectOne(repository.postUrl);
@@ -106,7 +104,7 @@ describe('Repository', () => {
         const subject = new Subject();
 
         let isLoaded = false;
-        
+
         const expected = posts;
 
         const  observable = repository.getPosts();
@@ -118,7 +116,7 @@ describe('Repository', () => {
         });
 
         subject.subscribe({
-          complete:() => {
+          complete: () => {
             isLoaded = true;
             expect(isLoaded).toBeTruthy();
           }
