@@ -3,7 +3,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Repository } from './repository';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Post } from '../models/post';
 import { post } from 'selenium-webdriver/http';
 describe('Repository', () => {
@@ -39,7 +39,10 @@ describe('Repository', () => {
       ) => {
 
         const expected = posts;
-        repository.getPosts().subscribe((p: Post[]) => {
+
+        const  observable = repository.getPosts();
+
+        observable.subscribe((p: Post[]) => {
           expect(p).toEqual(expected);
         });
 
@@ -69,8 +72,14 @@ describe('Repository', () => {
          return p;
         });
 
-        repository.getPostsWithTitlesInCapitalLetters().subscribe((p: Post[]) => {
+        const  observable = repository.getPostsWithTitlesInCapitalLetters();
+
+        observable.subscribe((p: Post[]) => {
           expect(p).toEqual(expected);
+        });
+
+        observable.subscribe((p: Post[]) => {
+          console.log("with the pipe share the observable uses the same stream")
         });
 
         const mockReq = httpMock.expectOne(repository.postUrl);
@@ -85,6 +94,49 @@ describe('Repository', () => {
       }
     )
   );
+
+  it('getPosts should return the posts and raise a notification when post are loaded',
+    inject(
+      [HttpTestingController, Repository],
+      (
+        httpMock: HttpTestingController,
+        repository: Repository
+      ) => {
+
+        const subject = new Subject();
+
+        let isLoaded = false;
+        
+        const expected = posts;
+
+        const  observable = repository.getPosts();
+
+        observable.subscribe((p: Post[]) => {
+          expect(p).toEqual(expected);
+          expect(isLoaded).toBeFalsy();
+          subject.complete();
+        });
+
+        subject.subscribe({
+          complete:() => {
+            isLoaded = true;
+            expect(isLoaded).toBeTruthy();
+          }
+        });
+
+        const mockReq = httpMock.expectOne(repository.postUrl);
+
+        expect(mockReq.cancelled).toBeFalsy();
+
+        expect(mockReq.request.responseType).toEqual('json');
+
+        mockReq.flush(posts);
+
+        httpMock.verify();
+      }
+    )
+  );
+
 });
 
 
