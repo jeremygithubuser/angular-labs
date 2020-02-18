@@ -52,7 +52,7 @@ describe('SwitchMapExampleComponent', () => {
   );
 
   it('should call the repository less times than the button is clicked thanks to switch map',
-  (done) => 
+  (done) =>
     inject(
       [HttpTestingController, Repository],
       (
@@ -69,19 +69,19 @@ describe('SwitchMapExampleComponent', () => {
 
         const delayedObservable = of(true).pipe(delay(500));
 
-        delayedObservable.subscribe(b=>{
+        delayedObservable.subscribe(b => {
 
           const mockReq = httpMock.expectOne(repository.postUrl);
           expect(mockReq.cancelled).toBeFalsy();
           expect(mockReq.request.responseType).toEqual('json');
-          mockReq.flush(posts);     
+          mockReq.flush(posts);
           fixture.detectChanges();
           expect(fixture.componentInstance.posts).toEqual(expected);
           done();
-        })
-        
+        });
+
       })()
-      
+
   );
 
 
